@@ -3,6 +3,7 @@ import shutil
 import sys
 import time
 import schedule
+import argparse
 from datetime import datetime
 
 from pydrive.drive import GoogleDrive 
@@ -44,41 +45,53 @@ def upload_backup(drive, path, file_name):
 
 
 
+
+# This kinda useleses to be honest
 def download_backup_from_ggdrive(drive):
     # Get All file in root folder
     f = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
     for file1 in f:
       print('title: %s, id: %s' % (file1['title'], file1['id']))
       # For each file backup and download to local machine and store it in folder you specify
-
+      
 
 def controller():
-    a,b = get_user_input()
-    print(a)
-    print(b)
-    path = r"/Users/zeroska/Works/GDSC/AutoBackUpGoogleDrive/ImportantFolderTest/"
+    path, archive_location = get_user_input()
+
     now = datetime.now()
+    # You could change file name here
     file_name = "backup " + now.strftime(r"%d/%m/%Y %H:%M:%S").replace('/', '-')
 
     if  not create_zip(path, file_name):
         sys.exit(0)
     auth, drive = google_auth()
+
     # TODO: Create option to choose between upload and download 
-
-
-    download_backup_from_ggdrive(drive)
-    #upload_backup(drive, r"/Users/zeroska/Works/GDSC/AutoBackUpGoogleDrive/archive", file_name+'.zip')
+    upload_backup(drive,archive_location , file_name+'.zip')
+    print("[*] Upload backup successfully - File name: " + file_name +'.zip') 
 
 def get_user_input():
-    path = sys.argv[1] 
-    archive_store_location = sys.argv[2]
-    if os.path.exists(path) and os.path.exist(archive_store_location):
-        return path, archive_store_location 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('Path', metavar='path',type=str,help='path to the file you want to archive')
+    parser.add_argument('Archive', metavar='archive', type=str, help='path to archive file you will store')
+    args = parser.parse_args()
+
+    input_path = args.Path
+    input_path_archive = args.Archive
+
+    if not os.path.isdir(input_path):
+        print('the path specified does not exist')
+        sys.exit()
+    elif not os.path.isdir(input_path_archive):
+        print('the archive path specified does not exist')
+        sys.exit()
+    
+    return input_path, input_path_archive
 
 
 if __name__=="__main__":
 
-    print("[*] backing up")
+    print("Zeroska - GG Backup Script")
     controller()
 
 
