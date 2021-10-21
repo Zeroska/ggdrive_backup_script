@@ -46,7 +46,7 @@ def upload_backup(drive, path, file_name):
 
 def download_backup_from_ggdrive(drive):
     # Get All file in root folder
-    f = drive.ListFile({'q': "'root' in parents  and trashed=false"}).GetList()
+    f = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
     for file1 in f:
       print('title: %s, id: %s' % (file1['title'], file1['id']))
       # For each file backup and download to local machine and store it in folder you specify
